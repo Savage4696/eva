@@ -24,13 +24,6 @@ export async function generateImageFromPrompt(input: ImageGenerationInput): Prom
   return imageGenerationFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'imageGenerationPrompt',
-  input: {schema: ImageGenerationInputSchema},
-  output: {schema: ImageGenerationOutputSchema},
-  prompt: `Generate an image based on the following prompt: {{{prompt}}}`,
-});
-
 const imageGenerationFlow = ai.defineFlow(
   {
     name: 'imageGenerationFlow',
@@ -39,8 +32,11 @@ const imageGenerationFlow = ai.defineFlow(
   },
   async input => {
     const {media} = await ai.generate({
-      model: 'googleai/imagen-4.0-fast-generate-001',
+      model: 'googleai/gemini-2.5-flash-image-preview',
       prompt: input.prompt,
+      config: {
+        responseModalities: ['TEXT', 'IMAGE'],
+      },
     });
     return {imageUrl: media.url!};
   }
