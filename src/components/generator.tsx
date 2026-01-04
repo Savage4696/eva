@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Wand2 } from 'lucide-react';
+import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Wand2, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -125,10 +125,10 @@ export default function Generator({ requestCount, setRequestCount, maxRequests }
              <Skeleton className="aspect-square w-full rounded-lg" />
            ) : (
             <>
-              <Skeleton className="h-8 w-1/4" />
+              <Skeleton className="h-6 w-3/4" />
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-5/6" />
             </>
            )}
         </div>
@@ -167,21 +167,21 @@ export default function Generator({ requestCount, setRequestCount, maxRequests }
 
 
   return (
-    <Tabs value={activeTab} onValueChange={onTabChange} className="w-full max-w-4xl">
-      <TabsList className="grid w-full grid-cols-3 mb-6">
+    <Tabs value={activeTab} onValueChange={onTabChange} className="w-full max-w-5xl">
+      <TabsList className="grid w-full grid-cols-3 mb-8">
         <TabsTrigger value="text"><FileText className="mr-2" />Text</TabsTrigger>
         <TabsTrigger value="image"><ImageIcon className="mr-2" />Image</TabsTrigger>
         <TabsTrigger value="audio"><AudioWaveform className="mr-2" />Audio</TabsTrigger>
       </TabsList>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="border-2 border-primary/20 shadow-lg shadow-primary/5">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wand2 className="text-accent" />
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <Wand2 className="text-primary" />
               Create your content
             </CardTitle>
-            <CardDescription>Enter a prompt to generate with AI. You have a limit of {maxRequests} free requests.</CardDescription>
+            <CardDescription>Enter a prompt and let our AI work its magic. You have {maxRequests - requestCount} free requests left.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -191,11 +191,11 @@ export default function Generator({ requestCount, setRequestCount, maxRequests }
                   name="prompt"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Your Prompt</FormLabel>
+                      <FormLabel className="text-base">Your Prompt</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder={`e.g., A futuristic cityscape at sunset for an image...`}
-                          className="min-h-[150px] resize-none"
+                          className="min-h-[150px] resize-none text-base"
                           {...field}
                         />
                       </FormControl>
@@ -203,11 +203,11 @@ export default function Generator({ requestCount, setRequestCount, maxRequests }
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading || requestCount >= maxRequests}>
+                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading || requestCount >= maxRequests}>
                   {isLoading ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
+                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating...</>
                   ) : (
-                    <>Generate</>
+                    <><Sparkles className="mr-2 h-5 w-5" />Generate</>
                   )}
                 </Button>
               </form>
@@ -215,12 +215,12 @@ export default function Generator({ requestCount, setRequestCount, maxRequests }
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col">
+        <Card className="flex flex-col bg-muted/30">
           <CardHeader>
-            <CardTitle>AI Output</CardTitle>
+            <CardTitle className="text-2xl">AI Output</CardTitle>
             <CardDescription>The result of your generation will appear below.</CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 flex items-center justify-center animate-in fade-in-50 duration-500">
+          <CardContent className="flex-1 flex items-center justify-center p-4 min-h-[200px] animate-in fade-in-50 duration-500">
             {renderOutput()}
           </CardContent>
         </Card>
