@@ -10,9 +10,9 @@ export default function Home() {
   const [requestCount, setRequestCount] = useState(0);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Header requestCount={requestCount} maxRequests={MAX_REQUESTS} />
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 w-full container mx-auto px-4 py-8 md:py-12">
         <Generator
           requestCount={requestCount}
           setRequestCount={setRequestCount}

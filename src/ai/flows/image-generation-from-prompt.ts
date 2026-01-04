@@ -33,11 +33,14 @@ const imageGenerationFlow = ai.defineFlow(
   async input => {
     const {media} = await ai.generate({
       model: 'googleai/gemini-1.5-flash-latest',
-      prompt: `Generate an image based on the following prompt: ${input.prompt}`,
+      prompt: `Generate an image that visually represents the following concept: ${input.prompt}`,
       config: {
         responseModalities: ['IMAGE'],
       },
     });
-    return {imageUrl: media.url!};
+    if (!media) {
+      throw new Error('Image generation failed to return media.');
+    }
+    return {imageUrl: media.url};
   }
 );
