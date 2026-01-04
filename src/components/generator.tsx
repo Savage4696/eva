@@ -19,7 +19,6 @@ import { cn } from '@/lib/utils';
 import { textGenerationFromPrompt } from '@/ai/flows/text-generation-from-prompt';
 import { generateImageFromPrompt } from '@/ai/flows/image-generation-from-prompt';
 import { generateAudioFromText } from '@/ai/flows/audio-generation-from-text';
-import { checkUsageLimits } from '@/ai/flows/usage-limit-enforcement';
 
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
@@ -31,13 +30,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 type GeneratorType = 'text' | 'image' | 'audio';
 
-interface GeneratorProps {
-  requestCount: number;
-  setRequestCount: (count: number | ((prevCount: number) => number)) => void;
-  maxRequests: number;
-}
-
-export default function Generator({ requestCount, setRequestCount, maxRequests }: GeneratorProps) {
+export default function Generator() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<GeneratorType>('text');
   const [isLoading, setIsLoading] = useState(false);
@@ -54,29 +47,6 @@ export default function Generator({ requestCount, setRequestCount, maxRequests }
   });
 
   const handleGeneration: SubmitHandler<FormValues> = async (data) => {
-    if (requestCount >= maxRequests) {
-      toast({
-        variant: 'destructive',
-        title: 'Request limit reached',
-        description: 'You have used all your free requests.',
-      });
-      return;
-    }
-
-    const usageCheck = await checkUsageLimits({
-      requestCount: requestCount + 1,
-      maxRequests: maxRequests,
-    });
-
-    if (!usageCheck.isWithinLimit) {
-        toast({
-            variant: 'destructive',
-            title: 'Usage Limit Warning',
-            description: usageCheck.message,
-        });
-        return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -93,7 +63,6 @@ export default function Generator({ requestCount, setRequestCount, maxRequests }
         const result = await generateAudioFromText({ prompt: data.prompt });
         setGeneratedAudioDataUri(result.audioDataUri);
       }
-      setRequestCount(prev => prev + 1);
     } catch (error) {
       console.error('Generation failed:', error);
       toast({
@@ -182,7 +151,7 @@ export default function Generator({ requestCount, setRequestCount, maxRequests }
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-8">
         <div className="text-center">
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">OmniFreeGen AI</h1>
-            <p className="text-muted-foreground mt-2">Generate text, images, and audio from a simple prompt. You have {maxRequests - requestCount} free requests left.</p>
+            <p className="text-muted-foreground mt-2">Generate text, images, and audio from a simple prompt.</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
@@ -211,7 +180,7 @@ export default function Generator({ requestCount, setRequestCount, maxRequests }
                     </FormItem>
                   )}
                 />
-                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading || requestCount >= maxRequests}>
+                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading}>
                   {isLoading ? (
                     <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating...</>
                   ) : (
