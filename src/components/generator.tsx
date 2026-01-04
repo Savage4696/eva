@@ -4,11 +4,10 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Wand2, Sparkles } from 'lucide-react';
+import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -150,7 +149,7 @@ export default function Generator() {
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-8">
         <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">OmniFreeGen AI</h1>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Omnigen AI</h1>
             <p className="text-muted-foreground mt-2">Generate text, images, and audio from a simple prompt.</p>
         </div>
 
