@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles } from 'lucide-react';
+import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble } from 'lucide-react';
 import Image from 'next/image';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,6 +20,7 @@ import { generateImageFromPrompt } from '@/ai/flows/image-generation-from-prompt
 import { generateAudioFromText } from '@/ai/flows/audio-generation-from-text';
 
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import CricketUpdates from './cricket-updates';
 
 const formSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters long.'),
@@ -27,7 +28,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-type GeneratorType = 'text' | 'image' | 'audio';
+type GeneratorType = 'text' | 'image' | 'audio' | 'cricket';
 
 export default function Generator() {
   const { toast } = useToast();
@@ -82,8 +83,10 @@ export default function Generator() {
 
   const onTabChange = (value: string) => {
     setActiveTab(value as GeneratorType);
-    form.reset();
-    resetOutputs();
+    if (value !== 'cricket') {
+      form.reset();
+      resetOutputs();
+    }
   };
   
   const renderOutput = () => {
@@ -148,18 +151,19 @@ export default function Generator() {
 
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-8">
-        <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Omniferra</h1>
-            <p className="text-muted-foreground mt-2">Generate text, images, and audio from a simple prompt.</p>
-        </div>
-
-        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8 max-w-md mx-auto">
-                <TabsTrigger value="text" className="text-base"><FileText className="mr-2" />Text</TabsTrigger>
-                <TabsTrigger value="image" className="text-base"><ImageIcon className="mr-2" />Image</TabsTrigger>
-                <TabsTrigger value="audio" className="text-base"><AudioWaveform className="mr-2" />Audio</TabsTrigger>
-            </TabsList>
-
+      <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-8 max-w-md mx-auto">
+              <TabsTrigger value="text" className="text-base"><FileText className="mr-2" />Text</TabsTrigger>
+              <TabsTrigger value="image" className="text-base"><ImageIcon className="mr-2" />Image</TabsTrigger>
+              <TabsTrigger value="audio" className="text-base"><AudioWaveform className="mr-2" />Audio</TabsTrigger>
+              <TabsTrigger value="cricket" className="text-base"><Dribbble className="mr-2" />Cricket</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="text">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Text Generation</h1>
+              <p className="text-muted-foreground mt-2">Create high-quality text from a simple prompt.</p>
+            </div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleGeneration)} className="space-y-6">
                 <FormField
@@ -170,7 +174,7 @@ export default function Generator() {
                       <FormLabel className="sr-only">Your Prompt</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder={`Enter a prompt to generate ${activeTab}... e.g., "A photo of a futuristic city at sunset"`}
+                          placeholder={`Enter a prompt to generate text... e.g., "Write a poem about a rainy day"`}
                           className="min-h-[120px] resize-none text-base p-4 bg-secondary/40 focus-visible:ring-primary"
                           {...field}
                         />
@@ -188,11 +192,91 @@ export default function Generator() {
                 </Button>
               </form>
             </Form>
-        </Tabs>
-        
-        <div className="mt-8">
-            {renderOutput()}
-        </div>
+             <div className="mt-8">
+              {renderOutput()}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="image">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Image Generation</h1>
+              <p className="text-muted-foreground mt-2">Create stunning images from a simple prompt.</p>
+            </div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleGeneration)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="prompt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="sr-only">Your Prompt</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={`Enter a prompt to generate an image... e.g., "A photo of a futuristic city at sunset"`}
+                          className="min-h-[120px] resize-none text-base p-4 bg-secondary/40 focus-visible:ring-primary"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading}>
+                  {isLoading ? (
+                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating...</>
+                  ) : (
+                    <><Sparkles className="mr-2 h-5 w-5" />Generate Content</>
+                  )}
+                </Button>
+              </form>
+            </Form>
+             <div className="mt-8">
+              {renderOutput()}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="audio">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Audio Generation</h1>
+              <p className="text-muted-foreground mt-2">Create realistic speech from a simple prompt.</p>
+            </div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleGeneration)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="prompt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="sr-only">Your Prompt</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={`Enter a prompt to generate audio... e.g., "The quick brown fox jumps over the lazy dog."`}
+                          className="min-h-[120px] resize-none text-base p-4 bg-secondary/40 focus-visible:ring-primary"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading}>
+                  {isLoading ? (
+                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating...</>
+                  ) : (
+                    <><Sparkles className="mr-2 h-5 w-5" />Generate Content</>
+                  )}
+                </Button>
+              </form>
+            </Form>
+             <div className="mt-8">
+              {renderOutput()}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="cricket">
+            <CricketUpdates />
+          </TabsContent>
+      </Tabs>
     </div>
   );
 }
