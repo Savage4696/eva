@@ -11,7 +11,7 @@ const inter = Inter({
 
 
 export const metadata: Metadata = {
-  title: 'Omnigen AI',
+  title: 'Omniferra',
   description: 'Generate text, images, and audio with free-tier AI.',
 };
 

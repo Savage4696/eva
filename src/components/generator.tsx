@@ -149,7 +149,7 @@ export default function Generator() {
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-8">
         <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Omnigen AI</h1>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Omniferra</h1>
             <p className="text-muted-foreground mt-2">Generate text, images, and audio from a simple prompt.</p>
         </div>
 
