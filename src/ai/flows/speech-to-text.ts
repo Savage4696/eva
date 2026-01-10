@@ -32,7 +32,7 @@ const speechToTextFlow = ai.defineFlow(
   },
   async input => {
     const {text} = await ai.generate({
-      model: 'googleai/gemini-1.5-flash',
+      model: 'googleai/gemini-pro',
       prompt: [
         {media: {url: input.audioDataUri}},
         {text: 'Transcribe the audio.'},
