@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble } from 'lucide-react';
+import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic } from 'lucide-react';
 import Image from 'next/image';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,6 +21,7 @@ import { generateAudioFromText } from '@/ai/flows/audio-generation-from-text';
 
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import CricketUpdates from './cricket-updates';
+import VoiceRecorder from './voice-recorder';
 
 const formSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters long.'),
@@ -28,7 +29,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-type GeneratorType = 'text' | 'image' | 'audio' | 'cricket';
+type GeneratorType = 'text' | 'image' | 'audio' | 'voice' | 'cricket';
 
 export default function Generator() {
   const { toast } = useToast();
@@ -83,7 +84,7 @@ export default function Generator() {
 
   const onTabChange = (value: string) => {
     setActiveTab(value as GeneratorType);
-    if (value !== 'cricket') {
+    if (value !== 'cricket' && value !== 'voice') {
       form.reset();
       resetOutputs();
     }
@@ -152,10 +153,11 @@ export default function Generator() {
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-8">
       <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 max-w-md mx-auto">
+          <TabsList className="grid w-full grid-cols-5 mb-8 max-w-lg mx-auto">
               <TabsTrigger value="text" className="text-base"><FileText className="mr-2" />Text</TabsTrigger>
               <TabsTrigger value="image" className="text-base"><ImageIcon className="mr-2" />Image</TabsTrigger>
               <TabsTrigger value="audio" className="text-base"><AudioWaveform className="mr-2" />Audio</TabsTrigger>
+              <TabsTrigger value="voice" className="text-base"><Mic className="mr-2" />Voice</TabsTrigger>
               <TabsTrigger value="cricket" className="text-base"><Dribbble className="mr-2" />Cricket</TabsTrigger>
           </TabsList>
           
@@ -273,6 +275,10 @@ export default function Generator() {
             </div>
           </TabsContent>
           
+          <TabsContent value="voice">
+            <VoiceRecorder />
+          </TabsContent>
+
           <TabsContent value="cricket">
             <CricketUpdates />
           </TabsContent>
