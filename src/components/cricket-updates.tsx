@@ -10,6 +10,7 @@ import { Skeleton } from './ui/skeleton';
 import { cn } from '@/lib/utils';
 
 export default function CricketUpdates() {
+  const [mounted, setMounted] = useState(false);
   const [matches, setMatches] = useState<CricketMatch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -32,6 +33,7 @@ export default function CricketUpdates() {
   };
 
   useEffect(() => {
+    setMounted(true);
     fetchMatches();
     const interval = setInterval(fetchMatches, 60000); // Auto-refresh every 60 seconds
     return () => clearInterval(interval);
@@ -46,6 +48,15 @@ export default function CricketUpdates() {
         <span className="text-sm text-muted-foreground ml-1">({s.o})</span>
       </div>
     ));
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!mounted) return '';
+    try {
+      return new Date(dateString).toLocaleString();
+    } catch (e) {
+      return dateString;
+    }
   };
 
   const renderSkeleton = () => (
@@ -91,7 +102,9 @@ export default function CricketUpdates() {
               <Card key={match.id} className="bg-secondary/30 border-2 border-primary/10 hover:border-primary/20 transition-all">
                 <CardHeader>
                   <CardTitle className="text-lg">{match.name}</CardTitle>
-                  <p className="text-xs text-muted-foreground pt-1">{new Date(match.date).toLocaleString()} at {match.venue}</p>
+                  <p className="text-xs text-muted-foreground pt-1">
+                    {formatDate(match.date)} {match.venue ? `at ${match.venue}` : ''}
+                  </p>
                 </CardHeader>
                 <CardContent>
                   <div className="flex justify-between items-center mb-3">

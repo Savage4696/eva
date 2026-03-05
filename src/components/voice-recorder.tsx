@@ -12,6 +12,7 @@ const LIVE_TRANSCRIPTION_INTERVAL = 2000; // 2 seconds
 
 export default function VoiceRecorder() {
   const { toast } = useToast();
+  const [mounted, setMounted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -19,6 +20,10 @@ export default function VoiceRecorder() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const liveTranscriptionTimer = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const processLiveChunk = useCallback(async () => {
     if (audioChunksRef.current.length === 0 || isProcessing) {
@@ -40,7 +45,6 @@ export default function VoiceRecorder() {
       };
     } catch (error) {
       console.error('Live transcription failed:', error);
-      // Don't show toast for intermittent errors to avoid spamming the user
     } finally {
       setIsProcessing(false);
     }
@@ -64,7 +68,7 @@ export default function VoiceRecorder() {
         if (liveTranscriptionTimer.current) {
           clearInterval(liveTranscriptionTimer.current);
         }
-        await processLiveChunk(); // Process any remaining audio
+        await processLiveChunk(); 
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -114,6 +118,14 @@ export default function VoiceRecorder() {
     );
   };
 
+  if (!mounted) {
+    return (
+      <div className="w-full max-w-3xl mx-auto flex flex-col gap-8 opacity-0">
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-[300px] w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-8">

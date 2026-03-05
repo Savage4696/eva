@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -33,11 +33,16 @@ type GeneratorType = 'text' | 'image' | 'audio' | 'voice' | 'cricket';
 
 export default function Generator() {
   const { toast } = useToast();
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<GeneratorType>('text');
   const [isLoading, setIsLoading] = useState(false);
   const [generatedText, setGeneratedText] = useState('');
   const [generatedImageUrl, setGeneratedImageUrl] = useState('');
   const [generatedAudioDataUri, setGeneratedAudioDataUri] = useState('');
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const imagePlaceholder = PlaceHolderImages.find(img => img.id === 'image-placeholder');
 
@@ -149,6 +154,15 @@ export default function Generator() {
       </div>
     );
   };
+
+  if (!mounted) {
+    return (
+      <div className="w-full max-w-3xl mx-auto flex flex-col gap-8 opacity-0">
+        <Skeleton className="h-10 w-full max-w-lg mx-auto mb-8" />
+        <Skeleton className="h-[400px] w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-8">

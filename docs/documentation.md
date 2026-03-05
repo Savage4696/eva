@@ -9,10 +9,10 @@ Generate high-quality text content based on user prompts using the Gemini 1.5 Fl
 - **Location:** `src/ai/flows/text-generation-from-prompt.ts`
 - **Model:** `googleai/gemini-1.5-flash`
 
-### 2. Image Search (Unsplash)
-Fetch high-quality images from the Unsplash API based on user keywords.
+### 2. Image Search and Generation
+Fetch high-quality images from the gemini based on user keywords.
 - **Location:** `src/ai/flows/image-generation-from-prompt.ts`
-- **Provider:** Unsplash API
+- **Provider:** Gemini
 
 ### 3. Audio Generation (TTS)
 Convert text into realistic speech using Gemini's Text-to-Speech capabilities.
