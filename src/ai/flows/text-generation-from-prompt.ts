@@ -25,13 +25,6 @@ export async function textGenerationFromPrompt(input: TextGenerationFromPromptIn
   return textGenerationFromPromptFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'textGenerationFromPromptPrompt',
-  input: {schema: TextGenerationFromPromptInputSchema},
-  output: {schema: TextGenerationFromPromptOutputSchema},
-  prompt: `{{{prompt}}}`,
-});
-
 const textGenerationFromPromptFlow = ai.defineFlow(
   {
     name: 'textGenerationFromPromptFlow',
@@ -41,8 +34,8 @@ const textGenerationFromPromptFlow = ai.defineFlow(
   async input => {
     const {text} = await ai.generate({
       prompt: input.prompt,
-      model: 'googleai/gemini-2.5-flash',
+      model: 'googleai/gemini-1.5-flash',
     });
-    return {text};
+    return {text: text || "No text generated."};
   }
 );

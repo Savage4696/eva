@@ -6,3 +6,4 @@ import '@/ai/flows/audio-generation-from-text.ts';
 import '@/ai/flows/text-generation-from-prompt.ts';
 import '@/ai/flows/get-cricket-updates.ts';
 import '@/ai/flows/speech-to-text.ts';
+import '@/ai/flows/smart-search-assistant.ts';

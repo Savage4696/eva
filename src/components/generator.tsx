@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic } from 'lucide-react';
+import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic, BrainCircuit } from 'lucide-react';
 import Image from 'next/image';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,6 +22,7 @@ import { generateAudioFromText } from '@/ai/flows/audio-generation-from-text';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import CricketUpdates from './cricket-updates';
 import VoiceRecorder from './voice-recorder';
+import SmartAssistant from './smart-assistant';
 
 const formSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters long.'),
@@ -29,7 +30,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-type GeneratorType = 'text' | 'image' | 'audio' | 'voice' | 'cricket';
+type GeneratorType = 'text' | 'image' | 'audio' | 'voice' | 'cricket' | 'assistant';
 
 export default function Generator() {
   const { toast } = useToast();
@@ -89,7 +90,7 @@ export default function Generator() {
 
   const onTabChange = (value: string) => {
     setActiveTab(value as GeneratorType);
-    if (value !== 'cricket' && value !== 'voice') {
+    if (value !== 'cricket' && value !== 'voice' && value !== 'assistant') {
       form.reset();
       resetOutputs();
     }
@@ -165,17 +166,20 @@ export default function Generator() {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto flex flex-col gap-8">
+    <div className="w-full max-w-4xl mx-auto flex flex-col gap-8">
       <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8 max-w-lg mx-auto">
-              <TabsTrigger value="text" className="text-base"><FileText className="mr-2" />Text</TabsTrigger>
-              <TabsTrigger value="image" className="text-base"><ImageIcon className="mr-2" />Image</TabsTrigger>
-              <TabsTrigger value="audio" className="text-base"><AudioWaveform className="mr-2" />Audio</TabsTrigger>
-              <TabsTrigger value="voice" className="text-base"><Mic className="mr-2" />Voice</TabsTrigger>
-              <TabsTrigger value="cricket" className="text-base"><Dribbble className="mr-2" />Cricket</TabsTrigger>
-          </TabsList>
+          <div className="flex justify-center mb-8">
+            <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 max-w-2xl">
+                <TabsTrigger value="text" className="text-xs md:text-sm"><FileText className="mr-1 h-4 w-4" />Text</TabsTrigger>
+                <TabsTrigger value="image" className="text-xs md:text-sm"><ImageIcon className="mr-1 h-4 w-4" />Image</TabsTrigger>
+                <TabsTrigger value="audio" className="text-xs md:text-sm"><AudioWaveform className="mr-1 h-4 w-4" />TTS</TabsTrigger>
+                <TabsTrigger value="voice" className="text-xs md:text-sm"><Mic className="mr-1 h-4 w-4" />Voice</TabsTrigger>
+                <TabsTrigger value="assistant" className="text-xs md:text-sm font-semibold text-primary"><BrainCircuit className="mr-1 h-4 w-4" />Assistant</TabsTrigger>
+                <TabsTrigger value="cricket" className="text-xs md:text-sm"><Dribbble className="mr-1 h-4 w-4" />Scores</TabsTrigger>
+            </TabsList>
+          </div>
           
-          <TabsContent value="text">
+          <TabsContent value="text" className="space-y-6">
             <div className="text-center mb-8">
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Text Generation</h1>
               <p className="text-muted-foreground mt-2">Create high-quality text from a simple prompt.</p>
@@ -213,10 +217,10 @@ export default function Generator() {
             </div>
           </TabsContent>
 
-          <TabsContent value="image">
+          <TabsContent value="image" className="space-y-6">
             <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Image Generation</h1>
-              <p className="text-muted-foreground mt-2">Create stunning images from a simple prompt.</p>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Image Search</h1>
+              <p className="text-muted-foreground mt-2">Find high-quality images via Unsplash.</p>
             </div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleGeneration)} className="space-y-6">
@@ -228,7 +232,7 @@ export default function Generator() {
                       <FormLabel className="sr-only">Your Prompt</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder={`Enter a prompt to generate an image... e.g., "A photo of a futuristic city at sunset"`}
+                          placeholder={`Enter a keyword to search for... e.g., "A photo of a futuristic city at sunset"`}
                           className="min-h-[120px] resize-none text-base p-4 bg-secondary/40 focus-visible:ring-primary"
                           {...field}
                         />
@@ -239,9 +243,9 @@ export default function Generator() {
                 />
                 <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading}>
                   {isLoading ? (
-                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating...</>
+                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Searching...</>
                   ) : (
-                    <><Sparkles className="mr-2 h-5 w-5" />Generate Content</>
+                    <><ImageIcon className="mr-2 h-5 w-5" />Find Image</>
                   )}
                 </Button>
               </form>
@@ -251,10 +255,10 @@ export default function Generator() {
             </div>
           </TabsContent>
           
-          <TabsContent value="audio">
+          <TabsContent value="audio" className="space-y-6">
             <div className="text-center mb-8">
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Audio Generation</h1>
-              <p className="text-muted-foreground mt-2">Create realistic speech from a simple prompt.</p>
+              <p className="text-muted-foreground mt-2">Create realistic speech from a simple text prompt.</p>
             </div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleGeneration)} className="space-y-6">
@@ -277,9 +281,9 @@ export default function Generator() {
                 />
                 <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading}>
                   {isLoading ? (
-                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating...</>
+                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Synthesizing...</>
                   ) : (
-                    <><Sparkles className="mr-2 h-5 w-5" />Generate Content</>
+                    <><AudioWaveform className="mr-2 h-5 w-5" />Generate Speech</>
                   )}
                 </Button>
               </form>
@@ -291,6 +295,10 @@ export default function Generator() {
           
           <TabsContent value="voice">
             <VoiceRecorder />
+          </TabsContent>
+
+          <TabsContent value="assistant">
+            <SmartAssistant />
           </TabsContent>
 
           <TabsContent value="cricket">
