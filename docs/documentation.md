@@ -7,7 +7,7 @@ Omniferra is a versatile, AI-powered application built with Next.js that demonst
 ### 1. Text Generation
 Generate high-quality text content based on user prompts.
 - **Location:** `src/ai/flows/text-generation-from-prompt.ts`
-- **Model:** `googleai/gemini-1.5-flash`
+- **Model:** `googleai/gemini-2.5-flash`
 
 ### 2. Image Search
 Fetch high-quality images from Unsplash based on user keywords.
@@ -22,13 +22,13 @@ Convert text into realistic speech using Gemini's specialized TTS capabilities.
 ### 4. Live Speech-to-Text
 Real-time transcription of voice input using Gemini's multimodal capabilities.
 - **Location:** `src/ai/flows/speech-to-text.ts`
-- **Model:** `googleai/gemini-1.5-flash`
+- **Model:** `googleai/gemini-2.5-flash`
 - **Frontend:** `src/components/voice-recorder.tsx`
 
 ### 5. Smart Research Assistant
 A complex agent that researches topics via tool-calling and responds in both text and audio.
 - **Location:** `src/ai/flows/smart-search-assistant.ts`
-- **Models:** `googleai/gemini-1.5-flash` (Reasoning) & `googleai/gemini-2.5-flash-preview-tts` (Audio Output)
+- **Models:** `googleai/gemini-2.5-flash` (Reasoning) & `googleai/gemini-2.5-flash-preview-tts` (Audio Output)
 
 ### 6. Cricket Score Updates
 Live cricket match updates fetched from `cricketdata.org`.

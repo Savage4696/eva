@@ -73,16 +73,16 @@ const smartSearchAssistantFlow = ai.defineFlow(
     outputSchema: SmartSearchAssistantOutputSchema,
   },
   async input => {
-    // 1. Research and generate text answer
+    // 1. Research and generate text answer using Gemini 2.5 Flash
     const {text} = await ai.generate({
-      model: 'googleai/gemini-1.5-flash',
+      model: 'googleai/gemini-2.5-flash',
       prompt: `You are a smart research assistant. Research the following and provide a concise, helpful answer: ${input.prompt}`,
       tools: [webSearchTool],
     });
 
     const answer = text || "I researched your topic but couldn't formulate a specific answer. How else can I help?";
 
-    // 2. Convert text answer to audio
+    // 2. Convert text answer to audio using Gemini 2.5 Flash Preview TTS
     const { media } = await ai.generate({
       model: 'googleai/gemini-2.5-flash-preview-tts',
       config: {
