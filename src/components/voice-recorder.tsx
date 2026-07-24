@@ -7,11 +7,13 @@ import { useToast } from '@/hooks/use-toast';
 import { speechToText } from '@/ai/flows/speech-to-text';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
+import { useUsageLimit } from '@/hooks/use-usage-limit';
 
-const LIVE_TRANSCRIPTION_INTERVAL = 2000; // 2 seconds
+const LIVE_TRANSCRIPTION_INTERVAL = 4000; // Increased interval to save usage
 
 export default function VoiceRecorder() {
   const { toast } = useToast();
+  const { isLimitReached, incrementUsage } = useUsageLimit();
   const [mounted, setMounted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -41,6 +43,8 @@ export default function VoiceRecorder() {
         const result = await speechToText({ audioDataUri: base64Audio });
         if (result.transcript) {
           setTranscript(result.transcript);
+          // Only increment usage on meaningful transcripts to avoid burning limits
+          if (result.transcript.length > 5) incrementUsage();
         }
       };
     } catch (error) {
@@ -48,10 +52,19 @@ export default function VoiceRecorder() {
     } finally {
       setIsProcessing(false);
     }
-  }, [isProcessing]);
+  }, [isProcessing, incrementUsage]);
 
 
   const handleStartRecording = async () => {
+    if (isLimitReached) {
+      toast({
+        variant: 'destructive',
+        title: 'Limit Reached',
+        description: 'Please wait until tomorrow or check your usage bar.',
+      });
+      return;
+    }
+
     setTranscript('');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -73,7 +86,7 @@ export default function VoiceRecorder() {
       };
 
       mediaRecorderRef.current.start(LIVE_TRANSCRIPTION_INTERVAL);
-      liveTranscriptionTimer.current = setInterval(processLiveChunk, LIVE_TRANSCRIPTION_INTERVAL + 500);
+      liveTranscriptionTimer.current = setInterval(processLiveChunk, LIVE_TRANSCRIPTION_INTERVAL + 1000);
       setIsRecording(true);
 
     } catch (error) {
@@ -137,6 +150,7 @@ export default function VoiceRecorder() {
         <Button
           onClick={isRecording ? handleStopRecording : handleStartRecording}
           size="lg"
+          disabled={isLimitReached && !isRecording}
           className={cn(
             'rounded-full h-20 w-20 transition-all duration-300 relative',
             isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-primary'
@@ -146,7 +160,7 @@ export default function VoiceRecorder() {
           {isRecording ? <Square className="h-8 w-8" /> : <Mic className="h-8 w-8" />}
         </Button>
         <p className="text-sm text-muted-foreground">
-          {isRecording ? 'Recording... Click to stop.' : 'Click to start live transcription.'}
+          {isRecording ? 'Recording... Click to stop.' : isLimitReached ? 'Daily limit reached' : 'Click to start live transcription.'}
         </p>
       </div>
 

@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Skeleton } from './ui/skeleton';
+import { useUsageLimit } from '@/hooks/use-usage-limit';
 
 const formSchema = z.object({
   prompt: z.string().min(5, 'Please provide a clearer question (at least 5 characters).'),
@@ -21,6 +22,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function SmartAssistant() {
   const { toast } = useToast();
+  const { isLimitReached, incrementUsage } = useUsageLimit();
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{ answer: string; audioDataUri: string } | null>(null);
@@ -35,11 +37,21 @@ export default function SmartAssistant() {
   });
 
   const handleResearch: SubmitHandler<FormValues> = async (data) => {
+    if (isLimitReached) {
+      toast({
+        variant: 'destructive',
+        title: 'Limit Reached',
+        description: 'You have reached your daily request limit.',
+      });
+      return;
+    }
+
     setIsLoading(true);
     setResult(null);
     try {
       const response = await smartSearchAssistant({ prompt: data.prompt });
       setResult(response);
+      incrementUsage();
     } catch (error) {
       console.error('Research failed:', error);
       toast({
@@ -76,13 +88,14 @@ export default function SmartAssistant() {
                     placeholder="e.g., 'What is the current status of the Artemis moon mission?'"
                     className="min-h-[100px] bg-secondary/20 border-primary/10 focus-visible:ring-primary text-base"
                     {...field}
+                    disabled={isLimitReached}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" size="lg" className="w-full font-bold" disabled={isLoading}>
+          <Button type="submit" size="lg" className="w-full font-bold" disabled={isLoading || isLimitReached}>
             {isLoading ? (
               <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Researching & Synthesizing...</>
             ) : (

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic, BrainCircuit } from 'lucide-react';
+import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic, BrainCircuit, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { textGenerationFromPrompt } from '@/ai/flows/text-generation-from-prompt';
 import { generateImageFromPrompt } from '@/ai/flows/image-generation-from-prompt';
@@ -23,6 +24,8 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import CricketUpdates from './cricket-updates';
 import VoiceRecorder from './voice-recorder';
 import SmartAssistant from './smart-assistant';
+import UsageBar from './usage-bar';
+import { useUsageLimit } from '@/hooks/use-usage-limit';
 
 const formSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters long.'),
@@ -34,6 +37,7 @@ type GeneratorType = 'text' | 'image' | 'audio' | 'voice' | 'cricket' | 'assista
 
 export default function Generator() {
   const { toast } = useToast();
+  const { isLimitReached, incrementUsage, mounted: usageMounted } = useUsageLimit();
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<GeneratorType>('text');
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +58,15 @@ export default function Generator() {
   });
 
   const handleGeneration: SubmitHandler<FormValues> = async (data) => {
+    if (isLimitReached) {
+      toast({
+        variant: 'destructive',
+        title: 'Daily Limit Reached',
+        description: 'You have reached your limit of 20 requests for today. Please come back tomorrow!',
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -61,14 +74,17 @@ export default function Generator() {
         setGeneratedText('');
         const result = await textGenerationFromPrompt({ prompt: data.prompt });
         setGeneratedText(result.text);
+        incrementUsage();
       } else if (activeTab === 'image') {
         setGeneratedImageUrl('');
         const result = await generateImageFromPrompt({ prompt: data.prompt });
         setGeneratedImageUrl(result.imageUrl);
+        incrementUsage();
       } else if (activeTab === 'audio') {
         setGeneratedAudioDataUri('');
         const result = await generateAudioFromText({ prompt: data.prompt });
         setGeneratedAudioDataUri(result.audioDataUri);
+        incrementUsage();
       }
     } catch (error) {
       console.error('Generation failed:', error);
@@ -166,7 +182,19 @@ export default function Generator() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col gap-8">
+    <div className="w-full max-w-4xl mx-auto flex flex-col gap-4">
+      <UsageBar />
+      
+      {isLimitReached && (
+        <Alert variant="destructive" className="max-w-2xl mx-auto mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Usage Limit Reached</AlertTitle>
+          <AlertDescription>
+            You've used all your credits for today. Generation features are currently locked.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
           <div className="flex justify-center mb-8">
             <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 max-w-2xl">
@@ -197,13 +225,14 @@ export default function Generator() {
                           placeholder={`Enter a prompt to generate text... e.g., "Write a poem about a rainy day"`}
                           className="min-h-[120px] resize-none text-base p-4 bg-secondary/40 focus-visible:ring-primary"
                           {...field}
+                          disabled={isLimitReached}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading}>
+                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading || isLimitReached}>
                   {isLoading ? (
                     <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating...</>
                   ) : (
@@ -235,13 +264,14 @@ export default function Generator() {
                           placeholder={`Enter a keyword to search for... e.g., "A photo of a futuristic city at sunset"`}
                           className="min-h-[120px] resize-none text-base p-4 bg-secondary/40 focus-visible:ring-primary"
                           {...field}
+                          disabled={isLimitReached}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading}>
+                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading || isLimitReached}>
                   {isLoading ? (
                     <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Searching...</>
                   ) : (
@@ -273,13 +303,14 @@ export default function Generator() {
                           placeholder={`Enter a prompt to generate audio... e.g., "The quick brown fox jumps over the lazy dog."`}
                           className="min-h-[120px] resize-none text-base p-4 bg-secondary/40 focus-visible:ring-primary"
                           {...field}
+                          disabled={isLimitReached}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading}>
+                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading || isLimitReached}>
                   {isLoading ? (
                     <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Synthesizing...</>
                   ) : (
