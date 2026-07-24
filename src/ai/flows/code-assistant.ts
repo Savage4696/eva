@@ -20,6 +20,11 @@ const CodeAssistantInputSchema = z.object({
 });
 export type CodeAssistantInput = z.infer<typeof CodeAssistantInputSchema>;
 
+// Internal schema for the prompt that includes helper booleans for Handlebars logic
+const CodeAssistantPromptInputSchema = CodeAssistantInputSchema.extend({
+  isGenerate: z.boolean().describe('Whether the mode is generate.'),
+});
+
 const CodeAssistantOutputSchema = z.object({
   explanation: z.string().describe('A clear explanation of the code or the bug fix.'),
   code: z.string().describe('The generated or corrected code snippet.'),
@@ -33,11 +38,11 @@ export async function codeAssistant(input: CodeAssistantInput): Promise<CodeAssi
 
 const prompt = ai.definePrompt({
   name: 'codeAssistantPrompt',
-  input: {schema: CodeAssistantInputSchema},
+  input: {schema: CodeAssistantPromptInputSchema},
   output: {schema: CodeAssistantOutputSchema},
   prompt: `You are an expert senior software engineer and debugger. 
 
-{{#if (eq mode "generate")}}
+{{#if isGenerate}}
 Task: Generate high-quality, efficient, and well-documented code based on the following request.
 Request: {{{prompt}}}
 
@@ -69,7 +74,10 @@ const codeAssistantFlow = ai.defineFlow(
     outputSchema: CodeAssistantOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const {output} = await prompt({
+      ...input,
+      isGenerate: input.mode === 'generate',
+    });
     return output!;
   }
 );
