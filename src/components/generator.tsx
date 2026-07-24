@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic, BrainCircuit, AlertCircle, Wand2, GraduationCap, Briefcase, UserRound } from 'lucide-react';
+import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic, BrainCircuit, AlertCircle, Wand2, GraduationCap, Briefcase, UserRound, Download } from 'lucide-react';
 import Image from 'next/image';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -152,22 +152,40 @@ export default function Generator() {
               case 'image':
                 const imageUrl = generatedImageUrl || imagePlaceholder?.imageUrl || '';
                 return (
-                  <div className="aspect-square w-full relative overflow-hidden rounded-lg">
-                    <Image
-                      src={imageUrl}
-                      alt={generatedImageUrl ? form.getValues('prompt') : "Placeholder image"}
-                      fill
-                      className="object-cover transition-all duration-300 hover:scale-105"
-                      data-ai-hint={generatedImageUrl ? '' : imagePlaceholder?.imageHint}
-                      unoptimized={!!generatedImageUrl}
-                    />
+                  <div className="flex flex-col items-center gap-4 w-full">
+                    <div className="aspect-square w-full relative overflow-hidden rounded-lg">
+                      <Image
+                        src={imageUrl}
+                        alt={generatedImageUrl ? form.getValues('prompt') : "Placeholder image"}
+                        fill
+                        className="object-cover transition-all duration-300 hover:scale-105"
+                        data-ai-hint={generatedImageUrl ? '' : imagePlaceholder?.imageHint}
+                        unoptimized={!!generatedImageUrl}
+                      />
+                    </div>
+                    {generatedImageUrl && (
+                      <Button asChild size="sm" variant="outline" className="gap-2">
+                        <a href={generatedImageUrl} target="_blank" rel="noopener noreferrer" download="eva-ai-image.jpg">
+                          <Download className="h-4 w-4" />
+                          Download Image
+                        </a>
+                      </Button>
+                    )}
                   </div>
                 );
               case 'audio':
                 return generatedAudioDataUri ? (
-                  <audio controls src={generatedAudioDataUri} className="w-full">
-                    Your browser does not support the audio element.
-                  </audio>
+                  <div className="flex flex-col items-center gap-4 w-full">
+                    <audio controls src={generatedAudioDataUri} className="w-full">
+                      Your browser does not support the audio element.
+                    </audio>
+                    <Button asChild size="sm" variant="outline" className="gap-2">
+                      <a href={generatedAudioDataUri} download="eva-ai-audio.wav">
+                        <Download className="h-4 w-4" />
+                        Download Audio
+                      </a>
+                    </Button>
+                  </div>
                 ) : <p className="text-muted-foreground">Your generated audio will appear here.</p>;
               default:
                 return null;

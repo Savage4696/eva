@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Search, Volume2, Loader2, Sparkles } from 'lucide-react';
+import { Search, Volume2, Loader2, Sparkles, Download } from 'lucide-react';
 import { smartSearchAssistant } from '@/ai/flows/smart-search-assistant';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -113,9 +113,17 @@ export default function SmartAssistant() {
           </div>
           <p className="text-foreground leading-relaxed text-lg italic">"{result.answer}"</p>
           <div className="pt-4 border-t border-primary/10">
-            <div className="flex items-center gap-2 mb-3 text-sm font-medium text-muted-foreground">
-              <Volume2 className="h-4 w-4" />
-              <span>Audio Response</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Volume2 className="h-4 w-4" />
+                <span>Audio Response</span>
+              </div>
+              <Button asChild size="sm" variant="ghost" className="h-8 gap-2 text-xs">
+                <a href={result.audioDataUri} download="eva-assistant-response.wav">
+                  <Download className="h-3 w-3" />
+                  Download
+                </a>
+              </Button>
             </div>
             <audio controls src={result.audioDataUri} className="w-full h-10 shadow-inner rounded-md" autoPlay>
               Your browser does not support the audio element.
