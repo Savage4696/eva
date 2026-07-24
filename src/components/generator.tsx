@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic, BrainCircuit, AlertCircle, Wand2, GraduationCap, Briefcase, UserRound, Download } from 'lucide-react';
+import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic, BrainCircuit, AlertCircle, Wand2, GraduationCap, Briefcase, UserRound, Download, Code2 } from 'lucide-react';
 import Image from 'next/image';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,6 +26,7 @@ import CricketUpdates from './cricket-updates';
 import VoiceRecorder from './voice-recorder';
 import SmartAssistant from './smart-assistant';
 import PromptEnhancer from './prompt-enhancer';
+import CodeAssistant from './code-assistant';
 import UsageBar from './usage-bar';
 import { useUsageLimit } from '@/hooks/use-usage-limit';
 
@@ -36,7 +37,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-type GeneratorType = 'text' | 'image' | 'audio' | 'voice' | 'cricket' | 'assistant' | 'prompt-gen';
+type GeneratorType = 'text' | 'image' | 'audio' | 'voice' | 'cricket' | 'assistant' | 'prompt-gen' | 'code';
 
 export default function Generator() {
   const { toast } = useToast();
@@ -112,7 +113,7 @@ export default function Generator() {
 
   const onTabChange = (value: string) => {
     setActiveTab(value as GeneratorType);
-    if (value !== 'cricket' && value !== 'voice' && value !== 'assistant' && value !== 'prompt-gen') {
+    if (value !== 'cricket' && value !== 'voice' && value !== 'assistant' && value !== 'prompt-gen' && value !== 'code') {
       form.reset();
       resetOutputs();
     }
@@ -221,11 +222,12 @@ export default function Generator() {
 
       <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
           <div className="flex justify-center mb-8">
-            <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 max-w-4xl">
+            <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 max-w-5xl">
                 <TabsTrigger value="text" className="text-xs md:text-sm"><FileText className="mr-1 h-4 w-4" />Text</TabsTrigger>
                 <TabsTrigger value="image" className="text-xs md:text-sm"><ImageIcon className="mr-1 h-4 w-4" />Image</TabsTrigger>
                 <TabsTrigger value="audio" className="text-xs md:text-sm"><AudioWaveform className="mr-1 h-4 w-4" />TTS</TabsTrigger>
                 <TabsTrigger value="voice" className="text-xs md:text-sm"><Mic className="mr-1 h-4 w-4" />Voice</TabsTrigger>
+                <TabsTrigger value="code" className="text-xs md:text-sm"><Code2 className="mr-1 h-4 w-4" />Code</TabsTrigger>
                 <TabsTrigger value="prompt-gen" className="text-xs md:text-sm"><Wand2 className="mr-1 h-4 w-4" />Prompt</TabsTrigger>
                 <TabsTrigger value="assistant" className="text-xs md:text-sm font-semibold text-primary"><BrainCircuit className="mr-1 h-4 w-4" />Assistant</TabsTrigger>
                 <TabsTrigger value="cricket" className="text-xs md:text-sm"><Dribbble className="mr-1 h-4 w-4" />Scores</TabsTrigger>
@@ -404,6 +406,10 @@ export default function Generator() {
           
           <TabsContent value="voice">
             <VoiceRecorder />
+          </TabsContent>
+
+          <TabsContent value="code">
+            <CodeAssistant />
           </TabsContent>
 
           <TabsContent value="prompt-gen">
