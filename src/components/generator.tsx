@@ -4,19 +4,20 @@ import { useState, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic, BrainCircuit, AlertCircle, Wand2 } from 'lucide-react';
+import { FileText, Image as ImageIcon, AudioWaveform, Loader2, Sparkles, Dribbble, Mic, BrainCircuit, AlertCircle, Wand2, GraduationCap, Briefcase, UserRound } from 'lucide-react';
 import Image from 'next/image';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { textGenerationFromPrompt } from '@/ai/flows/text-generation-from-prompt';
+import { textGenerationFromPrompt, type TextGenerationMode } from '@/ai/flows/text-generation-from-prompt';
 import { generateImageFromPrompt } from '@/ai/flows/image-generation-from-prompt';
 import { generateAudioFromText } from '@/ai/flows/audio-generation-from-text';
 
@@ -30,6 +31,7 @@ import { useUsageLimit } from '@/hooks/use-usage-limit';
 
 const formSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters long.'),
+  mode: z.enum(['general', 'humanizer', 'academic', 'professional']).default('general'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -54,7 +56,7 @@ export default function Generator() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { prompt: '' },
+    defaultValues: { prompt: '', mode: 'general' },
     mode: 'onChange',
   });
 
@@ -73,7 +75,10 @@ export default function Generator() {
     try {
       if (activeTab === 'text') {
         setGeneratedText('');
-        const result = await textGenerationFromPrompt({ prompt: data.prompt });
+        const result = await textGenerationFromPrompt({ 
+          prompt: data.prompt,
+          mode: data.mode as TextGenerationMode 
+        });
         setGeneratedText(result.text);
         incrementUsage();
       } else if (activeTab === 'image') {
@@ -211,36 +216,90 @@ export default function Generator() {
           
           <TabsContent value="text" className="space-y-6">
             <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Text Generation</h1>
-              <p className="text-muted-foreground mt-2">Create high-quality text from a simple prompt.</p>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Advanced Text Generation</h1>
+              <p className="text-muted-foreground mt-2">Specialized modes for humanized, academic, or professional content.</p>
             </div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleGeneration)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="prompt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="sr-only">Your Prompt</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder={`Enter a prompt to generate text... e.g., "Write a poem about a rainy day"`}
-                          className="min-h-[120px] resize-none text-base p-4 bg-secondary/40 focus-visible:ring-primary"
-                          {...field}
-                          disabled={isLimitReached}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading || isLimitReached}>
-                  {isLoading ? (
-                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating...</>
-                  ) : (
-                    <><Sparkles className="mr-2 h-5 w-5" />Generate Content</>
-                  )}
-                </Button>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-2">
+                    <FormField
+                      control={form.control}
+                      name="prompt"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="sr-only">Your Prompt</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder={`Enter your request... e.g., "Summarize the findings of the latest AI safety report"`}
+                              className="min-h-[150px] resize-none text-base p-4 bg-secondary/40 focus-visible:ring-primary"
+                              {...field}
+                              disabled={isLimitReached}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="mode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Generation Mode</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-secondary/40">
+                                <SelectValue placeholder="Select a mode" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="general">
+                                <div className="flex items-center gap-2">
+                                  <Sparkles className="h-4 w-4" />
+                                  <span>General Assistant</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="humanizer">
+                                <div className="flex items-center gap-2">
+                                  <UserRound className="h-4 w-4" />
+                                  <span>Humanizer</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="academic">
+                                <div className="flex items-center gap-2">
+                                  <GraduationCap className="h-4 w-4" />
+                                  <span>Academic Helper</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="professional">
+                                <div className="flex items-center gap-2">
+                                  <Briefcase className="h-4 w-4" />
+                                  <span>Professional Research</span>
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            {field.value === 'humanizer' && "Rewrites text to sound more natural and less like AI."}
+                            {field.value === 'academic' && "Optimized for school work, research papers, and formal study."}
+                            {field.value === 'professional' && "Designed for business communication and professional reports."}
+                            {field.value === 'general' && "Standard versatile AI responses."}
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading || isLimitReached}>
+                      {isLoading ? (
+                        <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Working...</>
+                      ) : (
+                        <><Sparkles className="mr-2 h-5 w-5" />Generate</>
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </form>
             </Form>
              <div className="mt-8">

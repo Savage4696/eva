@@ -4,10 +4,15 @@ Eva AI is a versatile, AI-powered application built with Next.js that demonstrat
 
 ## AI Models & Services
 
-### 1. Text Generation
-Generate high-quality text content based on user prompts.
+### 1. Advanced Text Generation
+Generate high-quality text content based on user prompts with specialized modes.
 - **Location:** `src/ai/flows/text-generation-from-prompt.ts`
 - **Model:** `googleai/gemini-1.5-flash`
+- **Modes:**
+  - **General:** Standard versatile assistant.
+  - **Humanizer:** Rewrites text to sound natural and remove AI patterns.
+  - **Academic Helper:** Scholarly tone for school work and research.
+  - **Professional Research:** Concise, business-oriented output.
 
 ### 2. Image Search
 Fetch high-quality images from Unsplash based on user keywords.
