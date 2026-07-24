@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
+import BackgroundEffects from '@/components/background-effects';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -22,7 +23,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
-      <body className={cn("h-full font-sans antialiased", inter.variable)}>
+      <body className={cn("h-full font-sans antialiased relative", inter.variable)}>
+        <BackgroundEffects />
         {children}
         <Toaster />
       </body>
