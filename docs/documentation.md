@@ -1,6 +1,6 @@
-# Omniferra Project Documentation
+# Eva AI Project Documentation
 
-Omniferra is a versatile, AI-powered application built with Next.js that demonstrates the integration of various AI and data services.
+Eva AI is a versatile, AI-powered application built with Next.js that demonstrates the integration of various AI and data services.
 
 ## AI Models & Services
 

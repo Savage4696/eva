@@ -9,7 +9,7 @@ export default function Header() {
           <div className="bg-primary/10 p-2 rounded-lg">
             <Sparkles className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-xl font-bold text-foreground tracking-tight">Omniferra</h1>
+          <h1 className="text-xl font-bold text-foreground tracking-tight">Eva AI</h1>
         </div>
       </div>
     </header>

@@ -31,7 +31,7 @@ const webSearchTool = ai.defineTool(
   },
   async (input) => {
     // Simulated web search behavior
-    return `Simulated web search result for "${input.query}": Omniferra Smart Assistant found that the requested information is currently being synthesized. In a production environment, this tool would return real-time data from a search engine.`;
+    return `Simulated web search result for "${input.query}": Eva AI Smart Assistant found that the requested information is currently being synthesized. In a production environment, this tool would return real-time data from a search engine.`;
   }
 );
 
