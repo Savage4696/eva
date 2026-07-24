@@ -49,7 +49,7 @@ const textGenerationFromPromptFlow = ai.defineFlow(
     const {text} = await ai.generate({
       system: systemInstructions,
       prompt: input.prompt,
-      model: 'googleai/gemini-1.5-flash',
+      model: 'googleai/gemini-2.5-flash',
     });
     
     return {text: text || "No text generated."};
