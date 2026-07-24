@@ -14,7 +14,7 @@ Generate high-quality text content based on user prompts with specialized modes.
   - **Academic Helper:** Scholarly tone for school work and research.
   - **Professional Research:** Concise, business-oriented output.
 
-### 2. Image Search
+### 2. Image Generation
 Fetch high-quality images from Unsplash based on user keywords.
 - **Location:** `src/ai/flows/image-generation-from-prompt.ts`
 - **Provider:** Unsplash API (requires `UNSPLASH_ACCESS_KEY`)

@@ -327,7 +327,7 @@ export default function Generator() {
 
           <TabsContent value="image" className="space-y-6">
             <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Image Search</h1>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Image Generation</h1>
             </div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleGeneration)} className="space-y-6">
@@ -339,7 +339,7 @@ export default function Generator() {
                       <FormLabel className="sr-only">Your Prompt</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder={`Enter a keyword to search for... e.g., "A photo of a futuristic city at sunset"`}
+                          placeholder={`Enter a keyword to generate... e.g., "A photo of a futuristic city at sunset"`}
                           className="min-h-[120px] resize-none text-base p-4 bg-secondary/40 focus-visible:ring-primary"
                           {...field}
                           disabled={isLimitReached}
@@ -351,9 +351,9 @@ export default function Generator() {
                 />
                 <Button type="submit" size="lg" className="w-full font-bold text-lg" disabled={isLoading || isLimitReached}>
                   {isLoading ? (
-                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Searching...</>
+                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating...</>
                   ) : (
-                    <><ImageIcon className="mr-2 h-5 w-5" />Find Image</>
+                    <><ImageIcon className="mr-2 h-5 w-5" />Generate Image</>
                   )}
                 </Button>
               </form>
