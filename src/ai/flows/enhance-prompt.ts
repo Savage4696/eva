@@ -32,7 +32,7 @@ const enhancePromptFlow = ai.defineFlow(
   },
   async input => {
     const {text} = await ai.generate({
-      model: 'googleai/gemini-2.5-flash',
+      model: 'googleai/gemini-3.6-flash',
       system: "You are an expert prompt engineer. Your goal is to transform a simple, short user prompt into a high-quality, detailed, and effective prompt for an AI. Focus on adding context, specifying tone, defining the output format, and providing clear constraints. Keep the core intent of the original prompt but make it much more descriptive.",
       prompt: `Enhance this prompt: "${input.prompt}"`,
     });

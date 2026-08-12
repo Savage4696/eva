@@ -7,7 +7,7 @@ Eva AI is a versatile, AI-powered application built with Next.js that demonstrat
 ### 1. Advanced Text Generation
 Generate high-quality text content based on user prompts with specialized modes.
 - **Location:** `src/ai/flows/text-generation-from-prompt.ts`
-- **Model:** `googleai/gemini-2.5-flash`
+- **Model:** `googleai/gemini-3.6-flash`
 - **Modes:**
   - **General:** Standard versatile assistant.
   - **Humanizer:** Rewrites text to sound natural and remove AI patterns.
@@ -17,7 +17,7 @@ Generate high-quality text content based on user prompts with specialized modes.
 ### 2. Code Assistant (Generator & Debugger)
 A specialized agent for software development tasks.
 - **Location:** `src/ai/flows/code-assistant.ts`
-- **Model:** `googleai/gemini-2.5-flash`
+- **Model:** `googleai/gemini-3.6-flash` (via global configuration)
 - **Features:**
   - **Generation:** Creates code from natural language requests.
   - **Debugging:** Explains bugs and provides step-by-step fixes for provided code and error logs.
@@ -35,18 +35,18 @@ Convert text into realistic speech using Gemini's specialized TTS capabilities.
 ### 5. Live Speech-to-Text
 Real-time transcription of voice input using Gemini's multimodal capabilities.
 - **Location:** `src/ai/flows/speech-to-text.ts`
-- **Model:** `googleai/gemini-2.5-flash`
+- **Model:** `googleai/gemini-3.6-flash`
 - **Frontend:** `src/components/voice-recorder.tsx`
 
 ### 6. Smart Research Assistant
 A complex agent that researches topics via tool-calling and responds in both text and audio.
 - **Location:** `src/ai/flows/smart-search-assistant.ts`
-- **Models:** `googleai/gemini-2.5-flash` (Reasoning) & `googleai/gemini-2.5-flash-preview-tts` (Audio Output)
+- **Models:** `googleai/gemini-3.6-flash` (Reasoning) & `googleai/gemini-2.5-flash-preview-tts` (Audio Output)
 
 ### 7. Prompt Generator (Enhancer)
 Takes basic user input and transforms it into highly detailed, professional-grade AI prompts.
 - **Location:** `src/ai/flows/enhance-prompt.ts`
-- **Model:** `googleai/gemini-2.5-flash`
+- **Model:** `googleai/gemini-3.6-flash`
 
 ### 8. Cricket Score Updates
 Live cricket match updates fetched from `cricketdata.org`.
